@@ -1,0 +1,19 @@
+[package]
+name = "scp-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Shared types, crypto primitives, and async channel definitions for SCP"
+
+[dependencies]
+bitcoin.workspace = true
+secp256k1.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

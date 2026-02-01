@@ -1,0 +1,23 @@
+[package]
+name = "scp-vault"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Liquidity vault and delta-neutral strategies for SCP"
+
+[dependencies]
+scp-core = { path = "../scp-core" }
+scp-dlc = { path = "../scp-dlc" }
+scp-signer = { path = "../scp-signer" }
+bitcoin.workspace = true
+secp256k1.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tokio.workspace = true
+sled.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

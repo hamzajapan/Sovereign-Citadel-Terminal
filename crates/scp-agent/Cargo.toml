@@ -1,0 +1,22 @@
+[package]
+name = "scp-agent"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "AI Sentinel for dynamic risk management in SCP"
+
+[dependencies]
+scp-core = { path = "../scp-core" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tokio.workspace = true
+reqwest.workspace = true
+async-trait = "0.1"
+
+[dev-dependencies]
+tempfile.workspace = true
+scp-vault = { path = "../scp-vault" }
+secp256k1 = { version = "0.29", features = ["rand"] }

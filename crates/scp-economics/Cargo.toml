@@ -1,0 +1,21 @@
+[package]
+name = "scp-economics"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Token economics, LBO mechanism, and fee distribution for SCP"
+
+[dependencies]
+scp-core = { path = "../scp-core" }
+bitcoin.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tokio.workspace = true
+sled.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+rand.workspace = true

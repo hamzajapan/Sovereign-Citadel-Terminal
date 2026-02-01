@@ -1,0 +1,30 @@
+# Sovereign Citadel Protocol - Default Configuration
+
+[node]
+network = "signet"
+data_dir = "./data"
+log_level = "info"
+
+[vault]
+# Liquidity Pool Configuration
+min_deposit = 100000          # 0.001 BTC
+max_utilization = 0.80        # 80%
+base_spread = 0.02           # 2%
+withdrawal_delay_blocks = 6   # ~1 hour
+
+[agent]
+# AI Sentinel Configuration
+update_interval_secs = 30
+circuit_breaker_threshold = -0.8
+auto_adjust_spread = true
+toxicity_threshold = 0.75
+
+[economics]
+# Fee Distribution
+trading_fee_rate = 0.001     # 0.1%
+distribution_interval_secs = 28800 # 8 hours
+
+[lbo]
+tokens_per_sat = 10.0
+min_contribution = 100000
+max_contribution = 1000000000 # 10 BTC

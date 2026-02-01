@@ -1,0 +1,27 @@
+# Rust
+target/
+target_fresh/
+target_tauri/
+**/*.rs.bk
+
+# Node/Frontend
+node_modules/
+dist/
+build/
+.env
+.env.local
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# OS
+Thumbs.db
+
+# SCP Specific
+brain/
+tmp/
+test_cli_data/
+*.log

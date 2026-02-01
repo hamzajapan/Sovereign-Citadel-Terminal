@@ -1,0 +1,22 @@
+[package]
+name = "scp-chain"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Blockchain abstraction layer for SCP"
+
+[dependencies]
+scp-core = { path = "../scp-core" }
+bitcoin.workspace = true
+async-trait = "0.1"
+thiserror.workspace = true
+tracing.workspace = true
+tokio.workspace = true
+bdk_wallet = { workspace = true, optional = true } 
+
+[features]
+default = []
+bdk = ["dep:bdk_wallet"]
+
+[dev-dependencies]
