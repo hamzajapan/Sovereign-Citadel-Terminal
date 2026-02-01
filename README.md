@@ -67,31 +67,31 @@ Built for **Antifragility** and high-performance safety:
 
 ---
 
-## 6. Future Roadmap: To Infinity and Beyond 🚀
+## 6. Future Roadmap: To Infinity and Beyond 
 SCP v1.0 is just the foundation. Our vision is to evolve this protocol into a comprehensive financial ecosystem built atop Bitcoin's native layers.
 
-### Phase 1: Lightning-Fast Settlement (Lightning DLCs) ⚡
+### Phase 1: Lightning-Fast Settlement (Lightning DLCs) 
 Current DLCs are limited by Bitcoin's 10-minute block times. The future is real-time, instantaneous trading.
 - **Tech Stack**: Integration of DLCs within Lightning Network channels.
 - **Impact**:
     - **HFT Capabilities**: Open and close financial positions in milliseconds.
     - **Micro-contracts**: Near-zero fees allow for contracts as small as $1, democratizing access to professional hedging.
 
-### Phase 2: Asset Stability & Issuance (RGB & Taproot Assets) 💵
+### Phase 2: Asset Stability & Issuance (RGB & Taproot Assets) 
 Users need to hedge not just for more BTC, but to protect their purchasing power in stable units.
 - **Tech Stack**: Support for RGB Protocol and Taproot Assets.
 - **Impact**:
     - **Stablecoin Collateral**: Using USDT or L-USD (Bitcoin-native) as contract collateral.
     - **Synthetic Assets**: Enabling decentralized trading pairs like BTC/Gold or BTC/Oil without ever leaving the Bitcoin network.
 
-### Phase 3: Trustless AI (TEE-based Agents) 🛡️
+### Phase 3: Trustless AI (TEE-based Agents) 
 Eliminating the need for users to trust developers with risk management code.
 - **Tech Stack**: Executing AI Agents within **Trusted Execution Environments (TEEs)** like Intel SGX or AWS Nitro Enclaves.
 - **Impact**:
     - **Proof of Execution**: Users can cryptographically verify that the Agent is running the exact immutable source code with no hidden modifications.
     - **Autonomous Daemons**: The Agent becomes an unkillable, independent entity on the network.
 
-### Phase 4: Federated Oracle Network 🌐
+### Phase 4: Federated Oracle Network 
 Removing the single point of failure in oracle data.
 - **Tech Stack**: Implementing **FROST (Flexible Round-Optimized Schnorr Threshold Signatures)**.
 - **Impact**:
