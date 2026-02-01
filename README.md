@@ -118,3 +118,10 @@ cargo test --test full_cycle_test
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+## Community & Collaboration
+
+We welcome contributors and partners interested in advancing the Sovereign Citadel Protocol.
+
+- **GitHub Repository**: [hamzajapan/Sovereign-Citadel-Terminal](https://github.com/hamzajapan/Sovereign-Citadel-Terminal)
+- **Collaboration**: For inquiries regarding advanced development stages or partnerships, please reach out via GitHub issues or contact the maintainer directly.
