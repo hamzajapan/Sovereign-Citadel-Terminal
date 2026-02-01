@@ -17,7 +17,7 @@ scp-dlc = { path = "../crates/scp-dlc" }
 scp-vault = { path = "../crates/scp-vault" }
 scp-agent = { path = "../crates/scp-agent" }
 scp-economics = { path = "../crates/scp-economics" }
-scp-chain = { path = "../crates/scp-chain" }
+scp-chain = { path = "../crates/scp-chain", features = ["bdk"] }
 
 clap = { workspace = true, features = ["derive"] }
 tokio.workspace = true

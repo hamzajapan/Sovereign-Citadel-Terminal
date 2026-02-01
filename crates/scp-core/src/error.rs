@@ -138,6 +138,11 @@ pub enum Error {
     #[error("Missing configuration: {0}")]
     MissingConfig(String),
 
+    // ========== Network Errors ==========
+    /// Blockchain provider error.
+    #[error("Blockchain error: {0}")]
+    Blockchain(String),
+
     // ========== External Errors ==========
     /// I/O error.
     #[error("I/O error: {0}")]
@@ -209,6 +214,7 @@ impl Error {
             Error::Config(_) => "E701",
             Error::MissingConfig(_) => "E702",
             Error::Io(_) => "E801",
+            Error::Blockchain(_) => "E802",
             Error::FeatureNotImplemented(_) => "E900",
             Error::Internal(_) => "E999",
         }

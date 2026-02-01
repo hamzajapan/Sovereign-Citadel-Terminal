@@ -1,0 +1,17 @@
+{
+    "identifier": "default",
+    "description": "Allows all commands in the main crate",
+    "commands": {
+        "allow": [
+            "is_wallet_initialized",
+            "unlock_wallet",
+            "lock_wallet",
+            "is_wallet_locked",
+            "get_sentiment_history",
+            "get_governance_state",
+            "get_vault_metrics",
+            "stake",
+            "claim"
+        ]
+    }
+}

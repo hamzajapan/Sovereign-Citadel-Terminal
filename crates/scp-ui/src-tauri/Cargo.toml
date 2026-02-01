@@ -28,4 +28,6 @@ scp-core = { workspace = true }
 scp-agent = { workspace = true }
 scp-vault = { workspace = true }
 scp-economics = { workspace = true }
+scp-signer = { workspace = true }
+rand = "0.8"
 

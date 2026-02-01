@@ -7,6 +7,8 @@ use bitcoin::{ScriptBuf, Transaction, Txid};
 use scp_core::Result;
 
 pub mod mock;
+#[cfg(feature = "bdk")]
+pub mod esplora;
 
 /// Trait for blockchain operations.
 #[async_trait]

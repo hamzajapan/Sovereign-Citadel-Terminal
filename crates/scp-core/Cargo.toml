@@ -10,8 +10,9 @@ description = "Shared types, crypto primitives, and async channel definitions fo
 bitcoin.workspace = true
 secp256k1.workspace = true
 tokio.workspace = true
-serde.workspace = true
-serde_json.workspace = true
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
 thiserror.workspace = true
 tracing.workspace = true
 

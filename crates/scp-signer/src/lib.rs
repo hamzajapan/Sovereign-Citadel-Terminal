@@ -16,9 +16,11 @@
 //! - [`policy`] - Signing policy enforcement
 
 pub mod keystore;
+pub mod json_keystore;
 pub mod policy;
 pub mod signer;
 
 pub use keystore::{FileKeystore, Keystore};
+pub use json_keystore::JsonKeystore;
 pub use policy::{SigningPolicy, SigningRequest};
 pub use signer::Signer;

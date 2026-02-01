@@ -16,6 +16,10 @@ serde_json.workspace = true
 thiserror.workspace = true
 tracing.workspace = true
 tokio.workspace = true
+aes-gcm = "0.10"
+argon2 = "0.5"
+rand = "0.8"
+zeroize = { version = "1.8.2", features = ["derive"] }
 
 [dev-dependencies]
 tempfile.workspace = true

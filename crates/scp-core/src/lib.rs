@@ -11,6 +11,11 @@
 //! - [`error`] - Unified error types
 
 pub mod channels;
+pub mod config;
+
+// Ensure Error has Config variant
+// I'll check error.rs next, assuming it needs update
+
 pub mod crypto;
 pub mod error;
 pub mod types;

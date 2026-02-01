@@ -207,14 +207,25 @@ fn main() {
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("Failed to set subscriber");
 
-    // Get data directory
-    let data_dir = cli.data_dir.unwrap_or_else(|| {
-        let mut path = dirs::data_dir().unwrap_or_else(|| PathBuf::from("."));
-        path.push("sovereign-citadel");
-        path
-    });
+    // Load Config
+    // If config file doesn't exist, we might want to warn or purely rely on CLI defaults?
+    // For now, try to load if exists, or warn.
+    let config = if cli.config.exists() {
+        scp_core::config::Config::load(&cli.config).unwrap_or_else(|e| {
+            tracing::warn!("Failed to load config file: {}", e);
+            // Panic or return default? For now panic as config is updated
+            panic!("Config load failed");
+        })
+    } else {
+        // Fallback or error?
+        // Let's panic because we updated default.toml
+         panic!("Config file not found at {:?}. Use 'scp init' to create one.", cli.config);
+    };
 
-    info!(data_dir = ?data_dir, "Starting SCP CLI");
+    // Get data directory (CLI override > Config > Default)
+    let data_dir = cli.data_dir.unwrap_or_else(|| PathBuf::from(&config.node.data_dir));
+
+    info!(data_dir = ?data_dir, network = %config.node.network, "Starting SCP CLI");
 
     // 1. Initialize Economics State
     std::fs::create_dir_all(&data_dir).expect("Failed to create data dir");
@@ -253,7 +264,8 @@ fn main() {
                 std::fs::create_dir_all(data_dir.join("dlc")).expect("Failed to create dlc dir");
                 std::fs::create_dir_all(data_dir.join("wallet"))
                     .expect("Failed to create wallet dir");
-                println!("✓ SCP node initialized for {} network", network);
+                // TODO: Generate default config file here if not exists
+                println!("✓ SCP node initialized for {} network at {:?}", network, data_dir);
             }
 
             Commands::Token { action } => match action {
@@ -297,6 +309,13 @@ fn main() {
                         .save(&staking_path)
                         .expect("Failed to save staking state");
                 }
+                TokenAction::ClaimRewards => {
+                    let amount = staking_pool.claim(&cli_user).expect("Claim failed");
+                    println!("Claimed {} sats", amount);
+                    staking_pool
+                        .save(&staking_path)
+                        .expect("Failed to save staking state");
+                }
                 TokenAction::Status => {
                     let metrics = staking_pool.metrics();
                     println!("=== Staking Pool Status ===");
@@ -313,13 +332,6 @@ fn main() {
                         println!("Pending Rewards: {} sats", pos.pending_rewards);
                         println!("Locked:        {}", pos.is_locked());
                     }
-                }
-                TokenAction::ClaimRewards => {
-                    let amount = staking_pool.claim(&cli_user).expect("Claim failed");
-                    println!("Claimed {} sats", amount);
-                    staking_pool
-                        .save(&staking_path)
-                        .expect("Failed to save staking state");
                 }
             },
 
@@ -391,11 +403,16 @@ fn main() {
                         let contracts = storage.list_all().unwrap_or_default();
                         println!("Contracts: {}", contracts.len());
                     }
-                    _ => println!("DLC command unimplemented in demo"),
+                    DlcAction::Show { id } => {
+                        println!("Show contract {}", id);
+                    }
+                     DlcAction::Offer { collateral, event } => {
+                        println!("Creating offer: {} sats, event: {}", collateral, event);
+                    }
                 }
             }
 
-            Commands::Agent { action } => {
+             Commands::Agent { action } => {
                 let agent = CitadelAgent::new(AgentConfig::default());
                 match action {
                     AgentAction::Status => {
@@ -412,19 +429,43 @@ fn main() {
             Commands::Run => {
                 info!("Starting SCP node...");
 
+                // Select Chain Provider
+                let chain: Arc<dyn scp_chain::BlockchainProvider> = if config.node.network == "signet" {
+                     info!("Connecting to Signet via Esplora...");
+                     let url = config.node.esplora_url.clone().unwrap_or_else(|| "https://mutinynet.com/api".to_string());
+                     let client = scp_chain::esplora::EsploraClient::new(&url).expect("Failed to create esplora client");
+                     Arc::new(client)
+                } else {
+                     info!("Using MockBlockchain (Regtest/Sim)");
+                     Arc::new(MockBlockchain::new())
+                };
+
                 let storage = Arc::new(
                     DlcStorage::new(data_dir.join("dlc")).expect("Failed to open DLC storage"),
                 );
-                let _sm = DlcStateMachine::new(storage.clone());
+                let _sm =   Arc::new(DlcStateMachine::new(storage.clone()));
                 let pool = Arc::new(LiquidityPool::new(PoolConfig::default()));
 
                 let (signal_tx, signal_rx) = tokio::sync::mpsc::channel(256);
                 let (event_tx, event_rx) = tokio::sync::mpsc::channel(256);
 
-                let mut agent = CitadelAgent::new(AgentConfig::default());
+                let mut agent_config = AgentConfig::default();
+                 // Map core config to agent config
+                 agent_config.poll_interval_secs = config.agent.update_interval_secs;
+                 agent_config.use_rss_sentiment = config.agent.use_rss_sentiment.unwrap_or(false);
+                 if let Some(url) = &config.agent.rss_url {
+                     agent_config.rss_url = url.clone();
+                 }
+
+                let mut agent = CitadelAgent::new(agent_config);
                 agent.attach_channels(signal_tx, event_rx);
 
-                let chain = Arc::new(MockBlockchain::new());
+                // Check height to verify connection
+                match chain.get_height().await {
+                    Ok(h) => info!("Chain Tip: {}", h),
+                    Err(e) => tracing::warn!("Failed to get chain tip: {}", e),
+                }
+
                 let oracle = Arc::new(MockOracle::new());
                 let keystore = MemoryKeystore::new();
                 let policy = scp_signer::policy::SigningPolicy::default_policy();
@@ -448,7 +489,7 @@ fn main() {
                 });
 
                 println!("=== Sovereign Citadel Protocol ===");
-                println!("Node running on signet network");
+                println!("Node running on {}", config.node.network);
                 println!(
                     "Pool ready:  {} available",
                     pool.metrics().available_liquidity

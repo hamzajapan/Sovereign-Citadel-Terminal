@@ -1,6 +1,7 @@
 use crate::sentiment::{
     MockSentimentProvider, SentimentProvider, SentimentScore, WebSentimentProvider,
 };
+use crate::rss_provider::RssSentimentProvider;
 use crate::spread::SpreadCalculator;
 use scp_core::channels::{AgentSignal, VaultEvent};
 use std::sync::Arc;
@@ -10,7 +11,9 @@ use tracing::{error, info, warn};
 
 pub struct AgentConfig {
     pub use_web_sentiment: bool,
+    pub use_rss_sentiment: bool,
     pub api_url: String,
+    pub rss_url: String,
     pub poll_interval_secs: u64,
 }
 
@@ -18,7 +21,9 @@ impl Default for AgentConfig {
     fn default() -> Self {
         Self {
             use_web_sentiment: false,
+            use_rss_sentiment: false,
             api_url: "https://api.coingecko.com/api/v3/ping".to_string(),
+            rss_url: "https://www.coindesk.com/arc/outboundfeeds/rss/".to_string(),
             poll_interval_secs: 60,
         }
     }
@@ -47,7 +52,9 @@ impl CitadelAgent {
     }
 
     pub fn new(config: AgentConfig) -> Self {
-        let sentiment_provider: Arc<dyn SentimentProvider> = if config.use_web_sentiment {
+        let sentiment_provider: Arc<dyn SentimentProvider> = if config.use_rss_sentiment {
+            Arc::new(RssSentimentProvider::new(&config.rss_url))
+        } else if config.use_web_sentiment {
             Arc::new(WebSentimentProvider::new(&config.api_url))
         } else {
             Arc::new(MockSentimentProvider::new(0.0))
@@ -66,32 +73,49 @@ impl CitadelAgent {
 
     pub async fn run(&mut self) {
         info!("Citadel Agent starting...");
+        
+        let (sentiment_tx, mut sentiment_rx) = mpsc::channel(32);
+        let provider = self.sentiment_provider.clone();
         let interval = Duration::from_secs(self.config.poll_interval_secs);
 
+        // 1. Spawn Background Worker for Sentiment (RSS/Web)
+        tokio::spawn(async move {
+            loop {
+                match provider.fetch_sentiment().await {
+                    Ok(score) => {
+                        if let Err(e) = sentiment_tx.send(score).await {
+                            error!("Sentiment worker failed to send: {}", e);
+                            break;
+                        }
+                    }
+                    Err(e) => error!("Sentiment worker fetch failed: {}", e),
+                }
+                sleep(interval).await;
+            }
+        });
+
+        // 2. Reactive Main Loop
         loop {
-            // 1. Fetch Sentiment
-            match self.sentiment_provider.fetch_sentiment().await {
-                Ok(score) => {
+            tokio::select! {
+                // Handle new sentiment scores
+                Some(score) = sentiment_rx.recv() => {
                     self.current_sentiment = score;
                     info!(
                         "Sentiment: {:.2} (Conf: {:.2})",
                         score.value, score.confidence
                     );
 
-                    // 2. Risk Logic
                     if score.is_high_risk() {
                         warn!("High risk detected! Triggering circuit breaker.");
                         self.emit_signal(AgentSignal::CircuitBreaker {
                             reason: "Extreme Fear Sentiment".into(),
-                            duration_secs: Some(3600), // Pause for 1 hour
+                            duration_secs: Some(3600),
                         })
                         .await;
                     } else {
-                        // Adjust spread
                         let spread_factor = self
                             .spread_calculator
-                            .calculate_multiplier(score.value, 0.5); // Fixed vol for now
-                                                                     // Only emit if factor implies a change (e.g. > 1.05 or < 0.95)
+                            .calculate_multiplier(score.value, 0.5);
                         if (spread_factor - 1.0).abs() > 0.01 {
                             self.emit_signal(AgentSignal::WidenSpread {
                                 factor: spread_factor,
@@ -100,10 +124,19 @@ impl CitadelAgent {
                         }
                     }
                 }
-                Err(e) => error!("Failed to fetch sentiment: {}", e),
-            }
 
-            sleep(interval).await;
+                // Handle protocol events (e.g. from Vault)
+                Some(event) = async {
+                    if let Some(rx) = &mut self.event_rx {
+                        rx.recv().await
+                    } else {
+                        None
+                    }
+                } => {
+                    info!("Agent received vault event: {:?}", event);
+                    // Process events (e.g. re-calculate spreads if liquidity changes significantly)
+                }
+            }
         }
     }
 

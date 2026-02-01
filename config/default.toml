@@ -2,6 +2,7 @@
 
 [node]
 network = "signet"
+esplora_url = "https://mutinynet.com/api"
 data_dir = "./data"
 log_level = "info"
 
@@ -18,6 +19,8 @@ update_interval_secs = 30
 circuit_breaker_threshold = -0.8
 auto_adjust_spread = true
 toxicity_threshold = 0.75
+use_rss_sentiment = true
+rss_url = "https://www.coindesk.com/arc/outboundfeeds/rss/"
 
 [economics]
 # Fee Distribution
