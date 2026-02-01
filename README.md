@@ -16,7 +16,7 @@ SCP allows users to provide liquidity and speculate on Bitcoin’s price without
 ## 2. Technical Architecture
 The system operates as a modular ecosystem composed of three primary functional layers:
 
-### A. The Brain: AI Sentinel (SCP-Agent) 🧠
+### A. The Brain: AI Sentinel (SCP-Agent) 
 An autonomous, 24/7 risk management engine that acts as the protocol's tactical commander.
 - **Sentiment Analysis**: Monitors global "Market Sentiment" by analyzing real-time news feeds and social data.
 - **Dynamic Risk Response**: 
@@ -24,12 +24,12 @@ An autonomous, 24/7 risk management engine that acts as the protocol's tactical 
     - **Circuit Breaker**: Automatically pauses trading if it detects market manipulation or sudden liquidity collapses.
 - **Zero-Trust Security**: The Agent never touches private keys. It issues strategic signals but has no authority to move funds.
 
-### B. The Body: Liquidity Vault (SCP-Vault) 🏦
+### B. The Body: Liquidity Vault (SCP-Vault) 
 The financial backend that manages the protocol's balance sheet and executes liquidity strategies.
 - **Delta-Neutral Strategy**: Automatically hedges protocol positions to ensure USD value stability while capturing yield from trading fees.
 - **Counterparty Matching**: Receives DLC requests and coordinates with the **Signer** to approve them based on strict, predefined safety policies.
 
-### C. The Heart: DLC Engine (SCP-DLC) 🔐
+### C. The Heart: DLC Engine (SCP-DLC) 
 The core innovation enabling non-custodial contracts on Bitcoin.
 - **Cryptographic Foundation**: Utilizing **Schnorr Signatures** and **Adaptor Signatures** (via `secp256k1-zkp`).
 - **Trustless Execution**: Users and the platform exchange "partial signatures" that only become valid when an independent Oracle publishes the price attestation.
@@ -37,7 +37,7 @@ The core innovation enabling non-custodial contracts on Bitcoin.
 
 ---
 
-## 3. The Economic Flywheel 💸
+## 3. The Economic Flywheel 
 The $CTDL token is designed for sustainable **Real Yield**, moving away from inflationary reward models.
 1.  **Traders**: Pay trading fees in satoshis to open hedging or speculative DLC positions.
 2.  **Protocol**: Aggregates all collected fees at the Treasury level.
